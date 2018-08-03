@@ -1,0 +1,17 @@
+A <- B <- C <- c(-1, 1)
+d <- expand.grid(A=A, B=B, C=C)
+y <- c(14.0, 16.8, 15.0, 15.4, 27.6, 24.0, 27.4, 22.6)
+A <- d$A
+B <- d$B
+C <- d$C
+D <- A*B
+E <- A*C
+F <- B*C
+G <- A*B*C
+model <- lm(y ~ A*B*C)
+model <- rsm(y ~ FO(A,B,C))
+summary(model)
+
+cubePlot(model,"A","B","C")
+plot.data <- contour(model, A~B, plot.it = FALSE)
+plot_ly(x = plot.data$`B ~ A`$x, y = plot.data$`B ~ A`$y, z = plot.data$`B ~ A`$z) %>% add_surface()

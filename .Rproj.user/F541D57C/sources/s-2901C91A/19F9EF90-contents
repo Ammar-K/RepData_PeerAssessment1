@@ -1,0 +1,32 @@
+library(plotly)
+library(geomorph)
+
+plyFile <- 'http://people.sc.fsu.edu/~jburkardt/data/ply/turbine.ply'
+dest <- basename(plyFile)
+if (!file.exists(dest)) {
+  download.file(plyFile, dest)
+}
+
+mesh <- read.ply(dest)
+# see getS3method("shade3d", "mesh3d") for details on how to plot
+
+# plot point cloud
+x <- mesh$vb["xpts",]
+y <- mesh$vb["ypts",]
+z <- mesh$vb["zpts",]
+m <- matrix(c(x,y,z), ncol=3, dimnames=list(NULL,c("x","y","z")))
+
+# now figure out the colormap
+zmean <- apply(t(mesh$it),MARGIN=1,function(row){mean(m[row,3])})
+
+library(scales)
+facecolor = colour_ramp(
+  brewer_pal(palette="RdBu")(9)
+)(rescale(x=zmean))
+
+plot_ly(
+  x = x, y = y, z = z,
+  i = mesh$it[1,]-1, j = mesh$it[2,]-1, k = mesh$it[3,]-1,
+  facecolor = facecolor,
+  type = "mesh3d"
+)
